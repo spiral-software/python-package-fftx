@@ -54,7 +54,13 @@ def ifft(src):
 
 def fftn(src):
     global _solver_cache
-    ckey = _solver_key('fftn', src)
+    try:
+        ckey = _solver_key('fftn', src)
+    except TypeError as ex:
+        print(ex)
+        xp = sw.get_array_module(src)
+        print('using ' + xp.__name__)
+        return xp.fft.fftn(src)
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MddftProblem(list(src.shape), SW_FORWARD)
@@ -65,7 +71,13 @@ def fftn(src):
 
 def ifftn(src):
     global _solver_cache
-    ckey = _solver_key('ifftn', src)
+    try:
+        ckey = _solver_key('ifftn', src)
+    except TypeError as ex:
+        print(ex)
+        xp = sw.get_array_module(src)
+        print('using ' + xp.__name__)
+        return xp.fft.ifftn(src)
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MddftProblem(list(src.shape), SW_INVERSE)
