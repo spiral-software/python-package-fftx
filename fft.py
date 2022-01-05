@@ -11,16 +11,24 @@ from snowwhite.dftsolver import *
 from snowwhite.mddftsolver import *
 
 _solver_cache = {}
+_dtype_tags = {'complex128' : 'z', 'complex64' : 'c'}
 
 def _solver_key(tf, src):
+    typetag = _dtype_tags.get(src.dtype.name, 0)
+    if typetag == 0:
+        msg = 'datatype ' + src.dtype.name + ' not supported'
+        raise TypeError(msg)
     szstr = 'x'.join([str(n) for n in list(src.shape)])
-    retkey = tf + '_' + szstr
+    retkey = typetag + tf + '_' + szstr
     if sw.get_array_module(src) == cp:
         retkey = retkey + '_CU'
     return retkey
     
 def _solver_opts(src):
-    return {SW_OPT_CUDA : True} if (sw.get_array_module(src) == cp) else {SW_OPT_CUDA : False}
+    opts = {SW_OPT_CUDA : True} if (sw.get_array_module(src) == cp) else {SW_OPT_CUDA : False}
+    if src.dtype.name == 'complex64':
+        opts[SW_OPT_REALCTYPE] = 'float'
+    return opts
     
 def fft(src):
     global _solver_cache
