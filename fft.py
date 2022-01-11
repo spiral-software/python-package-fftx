@@ -20,6 +20,8 @@ def _solver_key(tf, src):
         raise TypeError(msg)
     szstr = 'x'.join([str(n) for n in list(src.shape)])
     retkey = typetag + tf + '_' + szstr
+    if src.flags.f_contiguous:
+        retkey = retkey + 'F'
     if sw.get_array_module(src) == cp:
         retkey = retkey + '_CU'
     return retkey
@@ -28,6 +30,8 @@ def _solver_opts(src):
     opts = {SW_OPT_CUDA : True} if (sw.get_array_module(src) == cp) else {SW_OPT_CUDA : False}
     if src.dtype.name == 'complex64':
         opts[SW_OPT_REALCTYPE] = 'float'
+    if src.flags.f_contiguous:
+        opts[SW_OPT_COLMAJOR] = True
     return opts
     
 def fft(src):
