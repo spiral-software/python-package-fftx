@@ -40,5 +40,5 @@ else:
 
 diffCP = xp.max( xp.absolute( resPy - resC ) )
 
-print ('Difference between Numpy and FFTX transforms: ' + str(diffCP) )
+print ('Difference between ' + xp.__name__ + ' and FFTX transforms: ' + str(diffCP) )
 
