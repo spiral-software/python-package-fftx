@@ -29,9 +29,7 @@ def stepphase(src, amplitudes):
         opts[SW_OPT_REALCTYPE] = 'float'
         t = 's'
     ckey = t + '_stepphase_' + str(N)
-    print(ckey)
     solver = _solver_cache.get(ckey, 0)
-    print('solver: ', solver)
     if solver == 0:
         problem = StepPhaseProblem(N)
         solver  = StepPhaseSolver(problem, opts)
