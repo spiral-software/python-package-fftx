@@ -24,7 +24,7 @@ def stepphase(src, amplitudes):
     global _solver_cache
     N = list(src.shape)[1]
     t = 'd'
-    opts = {SW_OPT_CUDA : True}
+    opts = { SW_OPT_CUDA : False, SW_OPT_HIP : True }
     if src.dtype.name == 'float32':
         opts[SW_OPT_REALCTYPE] = 'float'
         t = 's'
