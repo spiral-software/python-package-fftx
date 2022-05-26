@@ -1,9 +1,11 @@
 #! python
 
 import sys
-from snowwhite.stepphasesolver import *
 import numpy as np
-import cupy as cp
+try:
+    import cupy as cp
+except ModuleNotFoundError:
+    cp = None
 import fftx
 
 #Cube Size
@@ -19,32 +21,29 @@ if len(sys.argv) > 2:
 dims = [N,N,N]
 dimsTuple = tuple(dims)
 
-genCuda = True          ##  set as default
-genHIP  = False
+forGPU = (cp != None)
 
 if len ( sys.argv ) > 3:
-    if sys.argv[3] == "CUDA":
-        genCuda = True
-    elif sys.argv[3] == "HIP":
-        genCuda = False
-        genHIP = True
-    elif sys.argv[3] == "CPU":
-        genCuda = False
+    if sys.argv[3] == "CPU":
+        forGPU = False
+        
 
-opts = { SW_OPT_CUDA : genCuda, SW_OPT_HIP : genHIP }
-
+#build test input in numpy (cupy does not have itemset)
 src = np.ones(dimsTuple, dtype=src_type)
 for  k in range (np.size(src)):
     src.itemset(k,np.random.random()*10.0)
 
-#convert to CuPy array
-src = cp.asarray(src) 
+xp = np
+if forGPU:
+    xp = cp
+    #convert src to CuPy array
+    src = cp.asarray(src) 
 
 #get amplitudes from src, so results of operation should ~= src
-amplitudes = cp.absolute(cp.fft.rfftn(src))
+amplitudes = xp.absolute(xp.fft.rfftn(src))
 
-dst = fftx.convo.stepphase(src, amplitudes, opts)
+dst = fftx.convo.stepphase(src, amplitudes)
 
-diff = cp.max ( cp.absolute ( src - dst ) )
+diff = xp.max(xp.absolute( src - dst ))
 
 print ('Diff between src and dst =  ' + str(diff) )
