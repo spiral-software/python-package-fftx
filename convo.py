@@ -22,12 +22,10 @@ _solver_cache = {}
 
 def stepphase(src, amplitudes):
     global _solver_cache
-    genCUDA = False
-    genHIP = False
+    platform = SW_CPU
     if sw.get_array_module(src) == cp:
-        genCUDA = not sw.has_ROCm()
-        genHIP = sw.has_ROCm()
-    opts = { SW_OPT_CUDA : genCUDA, SW_OPT_HIP : genHIP }
+        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
+    opts = { SW_OPT_PLATFORM : platform }
     N = list(src.shape)[1]
     t = 'd'
     if src.dtype.name == 'float32':

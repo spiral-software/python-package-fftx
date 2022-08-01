@@ -7,13 +7,10 @@ except ModuleNotFoundError:
     cp = None
 import fftx
 
-FORWARD = 1
-INVERSE = -1
+FORWARD = True
 
 # problem dimensions as a tuple
 ns = (16,16,16)
-
-direction = FORWARD
 
 # True/False for CUDA code
 genCuda = True
@@ -31,7 +28,7 @@ if genCuda:
     src = cp.asarray(src)
     xp = cp
         
-if direction == FORWARD:
+if FORWARD:
     resC  = fftx.fft.fftn(src)
     resPy = xp.fft.fftn(src)
 else:

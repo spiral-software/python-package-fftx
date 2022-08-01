@@ -3,14 +3,11 @@
 import numpy as np
 import fftx
 
-FORWARD = 1
-INVERSE = -1
+FORWARD = True
 
 # problem size
 n = 128
 
-direction = FORWARD
-    
 # init input
 src = np.zeros(n, complex)
 for k in range (n):
@@ -18,7 +15,7 @@ for k in range (n):
     vi = np.random.random()
     src[k] = vr + vi * 1j
         
-if direction == FORWARD:
+if FORWARD:
     resC  = fftx.fft.fft(src)
     resPy = np.fft.fft(src)
 else:
