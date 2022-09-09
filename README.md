@@ -17,12 +17,14 @@ clone this module into the same root directory as SnowWhite and name it **fftx**
 
 # Use
 
-This module currently offers direct replacements for the following Numpy functions:
+This module currently offers direct replacements for the following NumPy and CuPy functions:
 
 * fft.fft()
 * fft.ifft()
 * fft.fftn()
 * fft.ifftn()
+* fft.rfftn()
+* fft.irfftn()
 
 To use an fftx version of one of these Numpy functions, import the fftx module and change 
 from numpy to fftx in the function's full name, for example:

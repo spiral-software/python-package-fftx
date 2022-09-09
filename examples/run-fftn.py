@@ -17,7 +17,7 @@ genCuda = True
 genCuda = genCuda and (cp != None)
     
 # init input
-src = np.zeros(ns, complex)
+src = np.zeros(ns, np.cdouble)
 for k in range (np.size(src)):
     vr = np.random.random()
     vi = np.random.random()
