@@ -92,7 +92,7 @@ def ifftn(src):
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MddftProblem(list(src.shape), SW_INVERSE)
-        solver = MddftSolver(problem, l(src))
+        solver = MddftSolver(problem, _solver_opts(src))
         _solver_cache[ckey] = solver
     result = solver.solve(src)
     return result
