@@ -17,6 +17,7 @@ except ModuleNotFoundError:
 
 import snowwhite as sw
 from snowwhite.stepphasesolver import *
+from snowwhite.mdrconvsolver import *
 
 _solver_cache = {}
 
@@ -38,5 +39,25 @@ def stepphase(src, amplitudes):
         solver  = StepPhaseSolver(problem, opts)
         _solver_cache[ckey] = solver
     result = solver.solve(src, amplitudes)
+    return result
+
+def mdrconv(src, symbol):
+    global _solver_cache
+    platform = SW_CPU
+    if sw.get_array_module(src) == cp:
+        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
+    opts = { SW_OPT_PLATFORM : platform }
+    N = list(src.shape)[1]
+    t = 'd'
+    if src.dtype.name == 'float32':
+        opts[SW_OPT_REALCTYPE] = 'float'
+        t = 's'
+    ckey = t + '_mdrconv_' + str(N)
+    solver = _solver_cache.get(ckey, 0)
+    if solver == 0:
+        problem = MdrconvProblem(N)
+        solver  = MdrconvSolver(problem, opts)
+        _solver_cache[ckey] = solver
+    result = solver.scale(solver.solve(src, symbol))
     return result
 
