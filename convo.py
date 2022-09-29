@@ -58,6 +58,6 @@ def mdrconv(src, symbol):
         problem = MdrconvProblem(N)
         solver  = MdrconvSolver(problem, opts)
         _solver_cache[ckey] = solver
-    result = solver.scale(solver.solve(src, symbol))
+    result = solver.solve(src, symbol)
     return result
 
