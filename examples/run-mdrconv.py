@@ -38,8 +38,11 @@ testSrc[start] = 1.0
 
 symIn = xp.zeros((n*2,n*2,n*2)).astype(src_type)
 symIn[shift] = 1.0
-testSym = xp.fft.rfftn(symIn)
+testSymHalf = xp.fft.rfftn(symIn)
+testSymCube = xp.fft.fftn(symIn)
 
-result = fftx.convo.mdrconv(testSrc, testSym)
+result = fftx.convo.mdrconv(testSrc, testSymHalf)
+print('Using sliced symbol, result[target]   = %.5f' % result[target])
 
-print('result[target] = %.5f' % result[target])
+result = fftx.convo.mdrconv(testSrc, testSymCube)
+print('Using unsliced symbol, result[target] = %.5f' % result[target])
