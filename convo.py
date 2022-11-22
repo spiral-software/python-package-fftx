@@ -21,7 +21,7 @@ from snowwhite.mdrconvsolver import *
 
 _solver_cache = {}
 
-def stepphase(src, amplitudes):
+def stepphase(src, amplitudes, dst=None):
     global _solver_cache
     platform = SW_CPU
     if sw.get_array_module(src) == cp:
@@ -38,10 +38,9 @@ def stepphase(src, amplitudes):
         problem = StepPhaseProblem(N)
         solver  = StepPhaseSolver(problem, opts)
         _solver_cache[ckey] = solver
-    result = solver.solve(src, amplitudes)
-    return result
+    return solver.solve(src, amplitudes, dst)
 
-def mdrconv(src, symbol):
+def mdrconv(src, symbol, dst=None):
     global _solver_cache
     platform = SW_CPU
     if sw.get_array_module(src) == cp:
@@ -58,6 +57,6 @@ def mdrconv(src, symbol):
         problem = MdrconvProblem(N)
         solver  = MdrconvSolver(problem, opts)
         _solver_cache[ckey] = solver
-    result = solver.solve(src, symbol)
+    result = solver.solve(src, symbol, dst)
     return result
 

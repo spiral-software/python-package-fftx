@@ -63,14 +63,16 @@ print('')
 
 pytm = tf-ts
 
+#first call will allocate
+resC = None
 # warmup loop
 for i in range(10):
-    resC  = fftxfunc(src)
+    resC  = fftxfunc(src, resC)
 # timed loop
 print("Timing FFTX")
 ts = time.perf_counter()
 for i in range(10):
-    resC  = fftxfunc(src)
+    resC  = fftxfunc(src, resC)
 tf = time.perf_counter()
 print(f'{((tf - ts)/10.0):0.6f}')
 print('')

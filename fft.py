@@ -41,7 +41,7 @@ def _solver_opts(src):
         opts[SW_OPT_COLMAJOR] = True
     return opts
     
-def fft(src):
+def fft(src, dst=None):
     global _solver_cache
     ckey = _solver_key('fft', src)
     solver = _solver_cache.get(ckey, 0)
@@ -49,10 +49,10 @@ def fft(src):
         problem = DftProblem(src.size, SW_FORWARD)
         solver = DftSolver(problem)
         _solver_cache[ckey] = solver
-    result = solver.solve(src)
+    result = solver.solve(src, dst)
     return result
 
-def ifft(src):
+def ifft(src, dst=None):
     global _solver_cache
     ckey = _solver_key('1fft', src)
     solver = _solver_cache.get(ckey, 0)
@@ -60,10 +60,10 @@ def ifft(src):
         problem = DftProblem(src.size, SW_INVERSE)
         solver = DftSolver(problem)
         _solver_cache[ckey] = solver
-    result = solver.solve(src)
+    result = solver.solve(src, dst)
     return result
 
-def fftn(src):
+def fftn(src, dst=None):
     global _solver_cache
     try:
         ckey = _solver_key('fftn', src)
@@ -77,10 +77,9 @@ def fftn(src):
         problem = MddftProblem(list(src.shape), SW_FORWARD)
         solver = MddftSolver(problem, _solver_opts(src))
         _solver_cache[ckey] = solver
-    result = solver.solve(src)
-    return result
+    return solver.solve(src, dst)
 
-def ifftn(src):
+def ifftn(src, dst=None):
     global _solver_cache
     try:
         ckey = _solver_key('ifftn', src)
@@ -94,10 +93,10 @@ def ifftn(src):
         problem = MddftProblem(list(src.shape), SW_INVERSE)
         solver = MddftSolver(problem, _solver_opts(src))
         _solver_cache[ckey] = solver
-    result = solver.solve(src)
+    result = solver.solve(src, dst)
     return result
 
-def rfftn(src):
+def rfftn(src, dst=None):
     global _solver_cache
     try:
         ckey = _solver_key('rfftn', src, ['float64', 'float32'])
@@ -111,10 +110,10 @@ def rfftn(src):
         problem = MdprdftProblem(list(src.shape), SW_FORWARD)
         solver = MdprdftSolver(problem, _solver_opts(src))
         _solver_cache[ckey] = solver
-    result = solver.solve(src)
+    result = solver.solve(src, dst)
     return result
 
-def irfftn(src, dims):
+def irfftn(src, dims, dst=None):
     global _solver_cache
     try:
         ckey = _solver_key('irfftn', src)
@@ -128,7 +127,7 @@ def irfftn(src, dims):
         problem = MdprdftProblem(dims, SW_INVERSE)
         solver = MdprdftSolver(problem, _solver_opts(src))
         _solver_cache[ckey] = solver
-    result = solver.solve(src)
+    result = solver.solve(src, dst)
     return result
  
 
