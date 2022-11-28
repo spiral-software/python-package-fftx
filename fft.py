@@ -47,7 +47,7 @@ def fft(src, dst=None):
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = DftProblem(src.size, SW_FORWARD)
-        solver = DftSolver(problem)
+        solver = DftSolver(problem, _solver_opts(src))
         _solver_cache[ckey] = solver
     result = solver.solve(src, dst)
     return result
@@ -58,7 +58,7 @@ def ifft(src, dst=None):
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = DftProblem(src.size, SW_INVERSE)
-        solver = DftSolver(problem)
+        solver = DftSolver(problem, _solver_opts(src))
         _solver_cache[ckey] = solver
     result = solver.solve(src, dst)
     return result

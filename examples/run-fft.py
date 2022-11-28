@@ -2,14 +2,29 @@
 
 import numpy as np
 import fftx
+import sys
 
 FORWARD = True
+cxtype = np.cdouble
 
-# problem size
-n = 128
+if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
+    print("run-fftn size [ F|I [ d|s ]]")
+    print("  F  = Forward, I = Inverse")
+    print("  d  = double, s = single precision")
+    sys.exit()
+
+n = int(sys.argv[1])
+
+if len(sys.argv) > 2:
+    if sys.argv[2] == "I":
+        FORWARD = False
+
+if len(sys.argv) > 3:
+    if sys.argv[3] == "s":
+        cxtype = np.csingle
 
 # init input
-src = np.zeros(n, complex)
+src = np.zeros(n, cxtype)
 for k in range (n):
     vr = np.random.random()
     vi = np.random.random()
