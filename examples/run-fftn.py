@@ -14,7 +14,7 @@ cxtype = np.cdouble
 
 
 if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
-    print("run-fftn sz [ F|I [ d|s  [ GPU|CPU ]]]")
+    print("run-fftn sz [ F|I [ d|s [ GPU|CPU ]]]")
     print("  sz is N or N1,N2,N3")
     print("  F = Forward, I = Inverse")
     print("  d = double, s = single precision")
@@ -43,10 +43,8 @@ else:
     
 if plat_arg == "GPU" and (cp != None):
     forGPU = True
-    xp = cp
 else:
     forGPU = False 
-    xp = np       
 
 # init input
 src = np.zeros(dims, cxtype)
@@ -55,7 +53,7 @@ for k in range (np.size(src)):
     vi = np.random.random()
     src.itemset(k, vr + vi * 1j)
 
-xp = np    
+xp = np  
 if forGPU:
     src = cp.asarray(src)
     xp = cp
