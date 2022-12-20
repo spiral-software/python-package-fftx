@@ -40,10 +40,16 @@ if forGPU:
     src = cp.asarray(src) 
 
 #get amplitudes from src, so results of operation should ~= src
+
+print('Test using half-cube amplitudes')
 amplitudes = xp.absolute(xp.fft.rfftn(src))
-
 dst = fftx.convo.stepphase(src, amplitudes)
+diff = xp.max(xp.absolute(src - dst))
+print('Diff between src and dst =  ' + str(diff))
 
-diff = xp.max(xp.absolute( src - dst ))
+print('Test using full-cube amplitudes')
+amplitudes = xp.absolute(xp.fft.fftn(src))
+dst = fftx.convo.stepphase(src, amplitudes)
+diff = xp.max(xp.absolute(src - dst))
+print('Diff between src and dst =  ' + str(diff))
 
-print ('Diff between src and dst =  ' + str(diff) )
