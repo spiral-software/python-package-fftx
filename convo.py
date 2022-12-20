@@ -24,7 +24,8 @@ _solver_cache = {}
 def stepphase(src, amplitudes, dst=None):
     global _solver_cache
     platform = SW_CPU
-    if sw.get_array_module(src) == cp:
+    xp = sw.get_array_module(src)
+    if cp == cp:
         platform = SW_HIP if sw.has_ROCm() else SW_CUDA
     opts = { SW_OPT_PLATFORM : platform }
     N = list(src.shape)[1]
@@ -38,7 +39,17 @@ def stepphase(src, amplitudes, dst=None):
         problem = StepPhaseProblem(N)
         solver  = StepPhaseSolver(problem, opts)
         _solver_cache[ckey] = solver
-    return solver.solve(src, amplitudes, dst)
+
+    #slice amplitudes if it's a cube   
+    shape = amplitudes.shape
+    if shape[0] == shape[2]:
+        N = shape[0]
+        Nx = (N // 2) + 1
+        _amps = xp.ascontiguousarray(amplitudes[:, :, :Nx])
+    else:
+        _amps = amplitudes
+        
+    return solver.solve(src, _amps, dst)
 
 def mdrconv(src, symbol, dst=None):
     global _solver_cache
