@@ -46,10 +46,12 @@ For a quick start, look through the example scripts in the **examples** subdirec
 python run-fftn.py
 usage: run-fftn sz [ F|I [ d|s [ GPU|CPU ]]]
   sz is N or N1,N2,N3
-  F  = Forward, I = Inverse
-  d  = double, s = single precision
+  F  = Forward, I = Inverse           (default: Forward)
+  d  = double, s = single precision   (default: double precision)
 
-Multidimensional FFT
+  (GPU is default target unless none exists or no CuPy)
+
+Three-dimensional complex FFT
 ```
 
 Typically the examples run an FFTX function along with the equivalent NumPy/CuPy function and compare the results.  Notice how the FFTX functions support both NumPy and CuPy arrays transparently.

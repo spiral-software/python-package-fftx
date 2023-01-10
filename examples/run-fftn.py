@@ -1,5 +1,16 @@
 #! python
 
+"""
+usage: run-fftn sz [ F|I [ d|s [ GPU|CPU ]]]
+  sz is N or N1,N2,N3
+  F  = Forward, I = Inverse           (default: Forward)
+  d  = double, s = single precision   (default: double precision)
+                                    
+  (GPU is default target unless none exists or no CuPy)
+  
+Three-dimensional complex FFT
+"""
+
 import numpy as np
 try:
     import cupy as cp
@@ -9,15 +20,8 @@ except ModuleNotFoundError:
 import fftx
 import sys
 
-FORWARD = True
-cxtype = np.cdouble
-
-
 if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
-    print("run-fftn sz [ F|I [ d|s [ GPU|CPU ]]]")
-    print("  sz is N or N1,N2,N3")
-    print("  F = Forward, I = Inverse")
-    print("  d = double, s = single precision")
+    print(__doc__.strip())
     sys.exit()
 
 nnn = sys.argv[1].split(',')
@@ -27,11 +31,13 @@ n2 = (lambda:n1, lambda:int(nnn[1]))[len(nnn) > 1]()
 n3 = (lambda:n2, lambda:int(nnn[2]))[len(nnn) > 2]()
 
 dims = (n1,n2,n3)
-    
+
+FORWARD = True    
 if len(sys.argv) > 2:
     if sys.argv[2] == "I":
         FORWARD = False
-        
+
+cxtype = np.cdouble        
 if len(sys.argv) > 3:
     if sys.argv[3] == "s":
         cxtype = np.csingle

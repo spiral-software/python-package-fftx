@@ -1,3 +1,15 @@
+#! python
+
+"""
+usage: time-fftn sz [ F|I [ d|s [ GPU|CPU ]]]
+  sz is N or N1,N2,N3
+  F  = Forward, I = Inverse           (default: Forward)
+  d  = double, s = single precision   (default: double precision)
+                                    
+  (GPU is default target unless none exists or no CuPy)
+  
+Time FFTX vs. NumPy/CuPy three-dimensional complex FFT
+"""
 
 import numpy as np
 try:
@@ -6,28 +18,51 @@ except ModuleNotFoundError:
     cp = None
 import time
 import fftx
+import sys
 
-# True/False for CUDA code
-genCuda = True
-genCuda = genCuda and (cp != None)
+if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
+    print(__doc__.strip())
+    sys.exit()
 
-FORWARD = 1
-INVERSE = -1
-# FORWARD/INVERSE transform
-direction = FORWARD
+nnn = sys.argv[1].split(',')
 
-# Size of cube
-M = 128
-ns = (M,M,M)
-src = np.zeros(ns, dtype=np.complex128)
+n1 = int(nnn[0])
+n2 = (lambda:n1, lambda:int(nnn[1]))[len(nnn) > 1]()
+n3 = (lambda:n2, lambda:int(nnn[2]))[len(nnn) > 2]()
+
+dims = (n1,n2,n3)
+
+FORWARD = True    
+if len(sys.argv) > 2:
+    if sys.argv[2] == "I":
+        FORWARD = False
+
+cxtype = np.cdouble        
+if len(sys.argv) > 3:
+    if sys.argv[3] == "s":
+        cxtype = np.csingle
+        
+if len ( sys.argv ) > 4:
+    plat_arg = sys.argv[4]
+else:
+    plat_arg = "GPU" if (cp != None) else "CPU"
+    
+if plat_arg == "GPU" and (cp != None):
+    forGPU = True
+else:
+    forGPU = False 
+
+# init input
+src = np.zeros(dims, cxtype)
 for k in range (np.size(src)):
     vr = np.random.random()
     vi = np.random.random()
     src.itemset(k, vr + vi * 1j)
 
-if genCuda:
-    xp = cp
+xp = np  
+if forGPU:
     src = cp.asarray(src)
+    xp = cp
     dev = 'GPU'
     pymod = 'CuPy'
 else:
@@ -35,7 +70,8 @@ else:
     dev = 'CPU'
     pymod = 'NumPy'
 
-if direction == FORWARD:
+
+if FORWARD:
     pyfunc = xp.fft.fftn
     fftxfunc = fftx.fft.fftn
     funcname = 'fftn'
@@ -45,7 +81,7 @@ else:
     funcname = 'ifftn'
 
     
-print('**** Timing ' + funcname + ' on ' + dev + ', data type: ' + src.dtype.name + ', dims: ' + str(ns) + ' ****')
+print('**** Timing ' + funcname + ' on ' + dev + ', data type: ' + src.dtype.name + ', dims: ' + str(dims) + ' ****')
 print('')
     
 
