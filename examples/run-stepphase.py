@@ -1,5 +1,13 @@
 #! python
 
+"""
+usage: run-stepphase  N [ d|s [ GPU|CPU ]]
+  N = cube size                       (recommend 81)
+  d  = double, s = single precision   (default: double precision)
+                                    
+  (GPU is default target unless none exists or no CuPy)
+"""
+
 import sys
 import numpy as np
 try:
@@ -8,10 +16,12 @@ except ModuleNotFoundError:
     cp = None
 import fftx
 
+if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
+    print(__doc__.strip())
+    sys.exit()
+
 #Cube Size
-N = 81
-if len(sys.argv) > 1:
-    N = int ( sys.argv[1] )
+N = int ( sys.argv[1] )
 
 src_type = np.double
 if len(sys.argv) > 2:
@@ -40,10 +50,16 @@ if forGPU:
     src = cp.asarray(src) 
 
 #get amplitudes from src, so results of operation should ~= src
+
+print('Test using half-cube amplitudes')
 amplitudes = xp.absolute(xp.fft.rfftn(src))
-
 dst = fftx.convo.stepphase(src, amplitudes)
+diff = xp.max(xp.absolute(src - dst))
+print('Diff between src and dst =  ' + str(diff))
 
-diff = xp.max(xp.absolute( src - dst ))
+print('Test using full-cube amplitudes')
+amplitudes = xp.absolute(xp.fft.fftn(src))
+dst = fftx.convo.stepphase(src, amplitudes)
+diff = xp.max(xp.absolute(src - dst))
+print('Diff between src and dst =  ' + str(diff))
 
-print ('Diff between src and dst =  ' + str(diff) )
