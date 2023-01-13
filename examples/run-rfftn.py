@@ -1,35 +1,66 @@
 #! python
 
+"""
+usage: run-rfftn sz [ F|I [ d|s [ GPU|CPU ]]]
+  sz is N or N1,N2,N3                 (dimensions of real array)
+  F  = Forward, I = Inverse           (default: Forward)
+  d  = double, s = single precision   (default: double precision)
+                                    
+  (GPU is default target unless none exists or no CuPy)
+  
+Three-dimensional real-to-complex FFT (inverse is complex-to-real)
+"""
+
 import numpy as np
 try:
     import cupy as cp
 except ModuleNotFoundError:
     cp = None
 import fftx
+import sys
 
-FORWARD = True
-DOUBLE  = True
+if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
+    print(__doc__.strip())
+    sys.exit()
 
-# problem dimensions as a tuple
-dims = [32,32,32]
+nnn = sys.argv[1].split(',')
 
-# True/False for CUDA code
-genCuda = True
-genCuda = genCuda and (cp != None)
+n1 = int(nnn[0])
+n2 = (lambda:n1, lambda:int(nnn[1]))[len(nnn) > 1]()
+n3 = (lambda:n2, lambda:int(nnn[2]))[len(nnn) > 2]()
 
-if DOUBLE:
-    ftype = np.double
-    cxtype = np.cdouble
+dims = [n1,n2,n3]
+
+FORWARD = True    
+if len(sys.argv) > 2:
+    if sys.argv[2] == "I":
+        FORWARD = False
+
+ftype = np.double
+cxtype = np.cdouble       
+if len(sys.argv) > 3:
+    if sys.argv[3] == "s":
+        ftype = np.single
+        cxtype = np.csingle
+        
+if len ( sys.argv ) > 4:
+    plat_arg = sys.argv[4]
 else:
-    ftype = np.single
-    cxtype = np.csingle
+    plat_arg = "GPU" if (cp != None) else "CPU"
     
+if plat_arg == "GPU" and (cp != None):
+    forGPU = True
+else:
+    forGPU = False 
+
 if FORWARD:
+    # real to complex
     src = np.ones(tuple(dims), ftype)
     for  k in range (np.size(src)):
         vr = np.random.random()
         src.itemset(k,vr)
 else:
+    # complex to real
     dims2 = dims.copy()
     z = dims2.pop()
     dims2.append(z // 2 + 1)
@@ -40,7 +71,7 @@ else:
         src.itemset(k,vr + vi * 1j)
 
 xp = np    
-if genCuda:
+if forGPU:
     src = cp.asarray(src)
     xp = cp
         

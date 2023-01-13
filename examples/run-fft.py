@@ -1,5 +1,15 @@
 #! python
 
+"""
+usage: run-fft size [ F|I [ d|s [ GPU|CPU ]]]
+  F  = Forward, I = Inverse           (default: Forward)
+  d  = double, s = single precision   (default: double precision)
+                                    
+  (GPU is default target unless none exists or no CuPy)                     
+                                    
+One-dimensional complex FFT
+"""
+
 import numpy as np
 try:
     import cupy as cp
@@ -12,9 +22,7 @@ FORWARD = True
 cxtype = np.cdouble
 
 if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
-    print("run-fft size [ F|I [ d|s [ GPU|CPU ]]]")
-    print("  F  = Forward, I = Inverse")
-    print("  d  = double, s = single precision")
+    print(__doc__.strip())
     sys.exit()
 
 n = int(sys.argv[1])
