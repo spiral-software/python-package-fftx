@@ -65,6 +65,11 @@ def ifft(src, dst=None):
 
 def fftn(src, dst=None):
     global _solver_cache
+    
+    #for GPU use CuPy function if number of dims is not 3
+    if (len(src.shape) != 3) and (sw.get_array_module(src) == cp):
+        return cp.fft.fftn(src)
+
     try:
         ckey = _solver_key('fftn', src)
     except TypeError as ex:
@@ -73,14 +78,24 @@ def fftn(src, dst=None):
         print('trying ' + xp.__name__ + '.fft.fftn()')
         return xp.fft.fftn(src)
     solver = _solver_cache.get(ckey, 0)
-    if solver == 0:
-        problem = MddftProblem(list(src.shape), SW_FORWARD)
-        solver = MddftSolver(problem, _solver_opts(src))
-        _solver_cache[ckey] = solver
-    return solver.solve(src, dst)
+    try:
+        if solver == 0:
+            problem = MddftProblem(list(src.shape), SW_FORWARD)
+            solver = MddftSolver(problem, _solver_opts(src))
+            _solver_cache[ckey] = solver
+        return solver.solve(src, dst)
+    except:
+        xp = sw.get_array_module(src)
+        print('trying ' + xp.__name__ + '.fft.fftn()')
+        return xp.fft.fftn(src)
 
 def ifftn(src, dst=None):
     global _solver_cache
+    
+    #for GPU use CuPy function if number of dims is not 3
+    if (len(src.shape) != 3) and (sw.get_array_module(src) == cp):
+        return cp.fft.ifftn(src)
+
     try:
         ckey = _solver_key('ifftn', src)
     except TypeError as ex:
@@ -89,11 +104,16 @@ def ifftn(src, dst=None):
         print('using ' + xp.__name__)
         return xp.fft.ifftn(src)
     solver = _solver_cache.get(ckey, 0)
-    if solver == 0:
-        problem = MddftProblem(list(src.shape), SW_INVERSE)
-        solver = MddftSolver(problem, _solver_opts(src))
-        _solver_cache[ckey] = solver
-    result = solver.solve(src, dst)
+    try:
+        if solver == 0:
+            problem = MddftProblem(list(src.shape), SW_INVERSE)
+            solver = MddftSolver(problem, _solver_opts(src))
+            _solver_cache[ckey] = solver
+        result = solver.solve(src, dst)
+    except:
+        xp = sw.get_array_module(src)
+        print('using ' + xp.__name__)
+        return xp.fft.ifftn(src)
     return result
 
 def rfftn(src, dst=None):
