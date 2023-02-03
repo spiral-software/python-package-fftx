@@ -2,13 +2,13 @@
 
 """
 usage: run-fftn sz [ F|I [ d|s [ GPU|CPU ]]]
-  sz is N or N1,N2,N3
+  sz is N or N1,N2,.. all N >= 2, single N implies 3D cube
   F  = Forward, I = Inverse           (default: Forward)
   d  = double, s = single precision   (default: double precision)
                                     
   (GPU is default target unless none exists or no CuPy)
   
-Three-dimensional complex FFT
+Multi-dimensional complex FFT
 """
 
 import numpy as np
@@ -20,17 +20,26 @@ except ModuleNotFoundError:
 import fftx
 import sys
 
-if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
+def usage():
     print(__doc__.strip())
     sys.exit()
 
-nnn = sys.argv[1].split(',')
-
-n1 = int(nnn[0])
-n2 = (lambda:n1, lambda:int(nnn[1]))[len(nnn) > 1]()
-n3 = (lambda:n2, lambda:int(nnn[2]))[len(nnn) > 2]()
-
-dims = (n1,n2,n3)
+# array dimensions
+try:
+  nnn = sys.argv[1].split(',')
+  n1 = int(nnn[0])
+  if len(nnn) < 2:
+    # default to 3D cube
+    dims = [n1,n1,n1]
+  else:
+    dims = [n1]
+    for i in range(1, len(nnn)):
+      dims.append(int(nnn[i]))
+except:
+  usage()
+  
+if any(n < 2 for n in dims):
+    usage()
 
 FORWARD = True    
 if len(sys.argv) > 2:

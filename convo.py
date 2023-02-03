@@ -3,8 +3,6 @@ FFTX Convo Module
 =================
 
 Convolutions and convolution-like functions
-
-Requires CuPy
 """
 
 import numpy as np
@@ -16,10 +14,57 @@ except ModuleNotFoundError:
 
 
 import snowwhite as sw
-from snowwhite.stepphasesolver import *
+from snowwhite.mdrconvsolver import *
 from snowwhite.mdrfsconvsolver import *
+from snowwhite.stepphasesolver import *
 
 _solver_cache = {}
+
+def mdrconv(src, symbol, dst=None):
+    """
+    Cyclic convolution
+    """
+    global _solver_cache
+    platform = SW_CPU
+    if sw.get_array_module(src) == cp:
+        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
+    opts = { SW_OPT_PLATFORM : platform }
+    N = list(src.shape)[1]
+    t = 'd'
+    if src.dtype.name == 'float32':
+        opts[SW_OPT_REALCTYPE] = 'float'
+        t = 's'
+    ckey = t + '_mdrconv_' + str(N)
+    solver = _solver_cache.get(ckey, 0)
+    if solver == 0:
+        problem = MdrconvProblem(N)
+        solver  = MdrconvSolver(problem, opts)
+        _solver_cache[ckey] = solver
+    result = solver.solve(src, symbol, dst)
+    return result
+
+def mdrfsconv(src, symbol, dst=None):
+    """
+    Free-space convolution
+    """
+    global _solver_cache
+    platform = SW_CPU
+    if sw.get_array_module(src) == cp:
+        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
+    opts = { SW_OPT_PLATFORM : platform }
+    N = list(src.shape)[1]
+    t = 'd'
+    if src.dtype.name == 'float32':
+        opts[SW_OPT_REALCTYPE] = 'float'
+        t = 's'
+    ckey = t + '_mdrfsconv_' + str(N)
+    solver = _solver_cache.get(ckey, 0)
+    if solver == 0:
+        problem = MdrfsconvProblem(N)
+        solver  = MdrfsconvSolver(problem, opts)
+        _solver_cache[ckey] = solver
+    result = solver.solve(src, symbol, dst)
+    return result
 
 def stepphase(src, amplitudes, dst=None):
     global _solver_cache
@@ -50,24 +95,4 @@ def stepphase(src, amplitudes, dst=None):
         _amps = amplitudes
         
     return solver.solve(src, _amps, dst)
-
-def mdrfsconv(src, symbol, dst=None):
-    global _solver_cache
-    platform = SW_CPU
-    if sw.get_array_module(src) == cp:
-        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
-    opts = { SW_OPT_PLATFORM : platform }
-    N = list(src.shape)[1]
-    t = 'd'
-    if src.dtype.name == 'float32':
-        opts[SW_OPT_REALCTYPE] = 'float'
-        t = 's'
-    ckey = t + '_mdrfsconv_' + str(N)
-    solver = _solver_cache.get(ckey, 0)
-    if solver == 0:
-        problem = MdrfsconvProblem(N)
-        solver  = MdrfsconvSolver(problem, opts)
-        _solver_cache[ckey] = solver
-    result = solver.solve(src, symbol, dst)
-    return result
 
