@@ -25,7 +25,7 @@ N = int ( sys.argv[1] )
 
 src_type = np.double
 if len(sys.argv) > 2:
-    if sys.argv[2] == "f":
+    if sys.argv[2] == "s":
         src_type = np.single
 
 dims = [N,N,N]
