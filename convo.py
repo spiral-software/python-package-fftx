@@ -35,6 +35,8 @@ def mdrconv(src, symbol, dst=None):
         opts[SW_OPT_REALCTYPE] = 'float'
         t = 's'
     ckey = t + '_mdrconv_' + str(N)
+    if sw.get_array_module(src) == cp:
+        ckey = ckey + '_CU'
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MdrconvProblem(N)
@@ -58,6 +60,8 @@ def mdrfsconv(src, symbol, dst=None):
         opts[SW_OPT_REALCTYPE] = 'float'
         t = 's'
     ckey = t + '_mdrfsconv_' + str(N)
+    if sw.get_array_module(src) == cp:
+        ckey = ckey + '_CU'
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MdrfsconvProblem(N)
@@ -79,6 +83,8 @@ def stepphase(src, amplitudes, dst=None):
         opts[SW_OPT_REALCTYPE] = 'float'
         t = 's'
     ckey = t + '_stepphase_' + str(N)
+    if sw.get_array_module(src) == cp:
+        ckey = ckey + '_CU'
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = StepPhaseProblem(N)
