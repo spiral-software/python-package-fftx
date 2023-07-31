@@ -31,9 +31,9 @@ The public version of the python-package-fftx repository is available [**here**]
 
 Now, you can keep your fork synced with the upstream repository, using **git**:
 ```shell
-git fetch upstream                    ## pulls any updates from upstream to local branch called upstream/master
+git fetch upstream                    ## pulls any updates from upstream to local branch called upstream/main
 git branch <your_branch>              ## create a unique branch for your changes
-git checkout <your_branch>            ## spitch to the your branch 
+git checkout <your_branch>            ## switch to the your branch 
 git merge upstream/main               ## merges any changes from the upstream to the local
 ```
 
@@ -59,7 +59,7 @@ To create the pull request, do the following:
 1.  Navigate to the repository on GitHub (i.e., your fork of the original).
 2.  In the **Branch** menu choose the branch that contains your committed changes.
 3.  Above the list of files, click **Pull request**.
-4.  The pull request shows dropdowns for branch selection: The **base repository** should be the master repository from which your clone was made.  The **base** branch dropdown selects the branch to which you want your changes added (normally **master**).  The **head repository** is your clone of the original.  In the **compare** branch dropdown select the branch to which you committed your changes (i.e., *\<your_branch\>*).
+4.  The pull request shows dropdowns for branch selection: The **base repository** should be the master repository from which your clone was made.  The **base** branch dropdown selects the branch to which you want your changes added (normally **develop**).  The **head repository** is your clone of the original.  In the **compare** branch dropdown select the branch to which you committed your changes (i.e., *\<your_branch\>*).
 5.  Enter a title and brief description for your pull request.
 6.  To create a pull request that is ready for review, click the **Create Pull Request** button.
 
