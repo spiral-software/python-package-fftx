@@ -1,5 +1,10 @@
 #! /bin/bash
 
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-fftx/blob/main/LICENSE)
+
 ##  run a couple of samples for each example script
 ##  if FFTX_HOME points to a location with prebuilt libraries then we'll exercise library code
 ##  as well as building some on the fly

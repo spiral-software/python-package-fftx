@@ -1,3 +1,10 @@
+# examples/run-mdrconv.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-fftx/blob/main/LICENSE)
+
 """
 usage: run-mdrconv.py sz [ d|s [ GPU|CPU ]]
     sz is N or N1,N2,N3 all N >= 4, single N implies 3D cube

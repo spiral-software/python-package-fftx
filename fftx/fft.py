@@ -1,3 +1,10 @@
+# fftx/fft.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-fftx/blob/main/LICENSE)
+
 
 import numpy as np
 
