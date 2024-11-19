@@ -52,17 +52,16 @@ if plat_arg == "GPU" and (cp != None):
 else:
     forGPU = False 
 
+xp = np  
+if forGPU:
+    xp = cp
+
 # init input
-src = np.zeros(n, cxtype)
+src = xp.zeros(n, cxtype)
 for k in range (n):
     vr = np.random.random()
     vi = np.random.random()
     src[k] = vr + vi * 1j
-
-xp = np  
-if forGPU:
-    src = cp.asarray(src)
-    xp = cp
         
 if FORWARD:
     resC  = fftx.fft.fft(src)
