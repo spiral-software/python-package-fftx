@@ -1,3 +1,10 @@
+# FFTX Package
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-fftx/blob/main/LICENSE)
+
 """
 FFTX
 ====
@@ -22,6 +29,6 @@ convo
 from . import fft
 from . import convo
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 

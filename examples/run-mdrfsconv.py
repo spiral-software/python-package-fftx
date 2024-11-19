@@ -1,4 +1,11 @@
 #! python
+# examples/run-mdrfsconv.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-fftx/blob/main/LICENSE)
+
 """
 usage: run-mdrfsconv N [ d|s [ GPU|CPU ]]
   N = cube size
