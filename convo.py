@@ -1,3 +1,10 @@
+# fftx/convo.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-fftx/blob/main/LICENSE)
+
 """
 FFTX Convo Module
 =================
@@ -13,10 +20,10 @@ except ModuleNotFoundError:
     cp = None
 
 
-import snowwhite as sw
-from snowwhite.mdrconvsolver import *
-from snowwhite.mdrfsconvsolver import *
-from snowwhite.stepphasesolver import *
+import spiralpy as sp
+from spiralpy.mdrconvsolver import *
+from spiralpy.mdrfsconvsolver import *
+from spiralpy.stepphasesolver import *
 
 _solver_cache = {}
 
@@ -25,18 +32,20 @@ def mdrconv(src, symbol, dst=None):
     Cyclic convolution
     """
     global _solver_cache
-    platform = SW_CPU
-    if sw.get_array_module(src) == cp:
-        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
-    opts = { SW_OPT_PLATFORM : platform }
-    N = list(src.shape)[1]
+    platform = SP_CPU
+    if sp.get_array_module(src) == cp:
+        platform = SP_HIP if sp.has_ROCm() else SP_CUDA
+    opts = { SP_OPT_PLATFORM : platform }
+    ##  N = list(src.shape)[1]
+    N = list(src.shape)         ##  [1]
     t = 'd'
     if src.dtype.name == 'float32':
-        opts[SW_OPT_REALCTYPE] = 'float'
+        opts[SP_OPT_REALCTYPE] = 'float'
         t = 's'
-    ckey = t + '_mdrconv_' + str(N)
-    if sw.get_array_module(src) == cp:
-        ckey = ckey + '_CU'
+
+    ns = 'x'.join([str(n) for n in N])  ##  problem.dimensions()])
+    ##  ckey = t + '_mdrconv_' + str(N)
+    ckey = t + '_mdrconv_' + ns
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MdrconvProblem(N)
@@ -50,18 +59,16 @@ def mdrfsconv(src, symbol, dst=None):
     Free-space convolution
     """
     global _solver_cache
-    platform = SW_CPU
-    if sw.get_array_module(src) == cp:
-        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
-    opts = { SW_OPT_PLATFORM : platform }
+    platform = SP_CPU
+    if sp.get_array_module(src) == cp:
+        platform = SP_HIP if sp.has_ROCm() else SP_CUDA
+    opts = { SP_OPT_PLATFORM : platform }
     N = list(src.shape)[1]
     t = 'd'
     if src.dtype.name == 'float32':
-        opts[SW_OPT_REALCTYPE] = 'float'
+        opts[SP_OPT_REALCTYPE] = 'float'
         t = 's'
     ckey = t + '_mdrfsconv_' + str(N)
-    if sw.get_array_module(src) == cp:
-        ckey = ckey + '_CU'
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MdrfsconvProblem(N)
@@ -72,19 +79,17 @@ def mdrfsconv(src, symbol, dst=None):
 
 def stepphase(src, amplitudes, dst=None):
     global _solver_cache
-    platform = SW_CPU
-    xp = sw.get_array_module(src)
+    platform = SP_CPU
+    xp = sp.get_array_module(src)
     if cp == cp:
-        platform = SW_HIP if sw.has_ROCm() else SW_CUDA
-    opts = { SW_OPT_PLATFORM : platform }
+        platform = SP_HIP if sp.has_ROCm() else SP_CUDA
+    opts = { SP_OPT_PLATFORM : platform }
     N = list(src.shape)[1]
     t = 'd'
     if src.dtype.name == 'float32':
-        opts[SW_OPT_REALCTYPE] = 'float'
+        opts[SP_OPT_REALCTYPE] = 'float'
         t = 's'
     ckey = t + '_stepphase_' + str(N)
-    if sw.get_array_module(src) == cp:
-        ckey = ckey + '_CU'
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = StepPhaseProblem(N)
