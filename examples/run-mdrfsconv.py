@@ -7,11 +7,10 @@
 # See LICENSE (https://github.com/spiral-software/python-package-fftx/blob/main/LICENSE)
 
 """
-usage: run-mdrfsconv N [ d|s [ GPU|CPU ]]
-  N = cube size
-  d  = double, s = single precision   (default: double precision)
-                                    
-  (GPU is default target unless none exists or no CuPy)                     
+usage: run-mdrfsconv.py sz [ d|s [ GPU|CPU ]]
+    sz is N or N1,N2,N3 all N >= 4, single N implies 3D cube
+    d  = double, s = single precision   (default: double precision)
+    (GPU is default target unless none exists or no CuPy)       
                                     
 Three-dimensional real free-space convolution
 """
@@ -24,12 +23,21 @@ except ModuleNotFoundError:
     cp = None
 import fftx
 
-if (len(sys.argv) < 2) or (sys.argv[1] == "?"):
+import sys
+
+def usage():
     print(__doc__.strip())
     sys.exit()
 
-#Cube Size
-n = int ( sys.argv[1] )
+##  array dimensions
+try:
+    nnn = sys.argv[1].split(',')
+    n1 = int(nnn[0])
+    n2 = (lambda:n1, lambda:int(nnn[1]))[len(nnn) > 1]()
+    n3 = (lambda:n2, lambda:int(nnn[2]))[len(nnn) > 2]()
+    dims = [n1,n2,n3]
+except:
+    usage()
 
 src_type = np.double
 cplx_type = np.complex128
@@ -47,9 +55,9 @@ xp = np
 if forGPU:
     xp = cp
 
-testSrc = xp.random.rand(n,n,n).astype(src_type)
+testSrc = xp.random.rand(n1,n2,n3).astype(src_type)
        
-symIn = xp.random.rand(n*2,n*2,n*2).astype(src_type)
+symIn = xp.random.rand(n1*2,n2*2,n3*2).astype(src_type)
 testSymHalf = xp.fft.rfftn(symIn)
 testSymCube = xp.fft.fftn(symIn)
 

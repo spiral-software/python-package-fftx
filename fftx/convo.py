@@ -65,17 +65,15 @@ def mdrfsconv(src, symbol, dst=None):
     if sp.get_array_module(src) == cp:
         platform = SP_HIP if sp.has_ROCm() else SP_CUDA
     opts = { SP_OPT_PLATFORM : platform }
-    N = list(src.shape)[1]
+    NNN = list(src.shape)
     t = 'd'
     if src.dtype.name == 'float32':
         opts[SP_OPT_REALCTYPE] = 'float'
         t = 's'
-    ckey = t + '_mdrfsconv_' + str(N)
-    if sp.get_array_module(src) == cp:
-        ckey = ckey + '_CU'
+    ckey = t + '_mdrfsconv_' + str(NNN)
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
-        problem = MdrfsconvProblem(N)
+        problem = MdrfsconvProblem(NNN)
         solver  = MdrfsconvSolver(problem, opts)
         _solver_cache[ckey] = solver
     result = solver.solve(src, symbol, dst)
