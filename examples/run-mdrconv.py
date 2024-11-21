@@ -40,9 +40,11 @@ if any(n < 4 for n in dims):
     usage()
 
 src_type = np.double
+cplx_type = np.complex128
 if len(sys.argv) > 2:
-    if sys.argv[2] == "f":
+    if sys.argv[2] == "s":
         src_type = np.single
+        cplx_type = np.complex64
 
 forGPU = (cp != None)
 if len ( sys.argv ) > 3:
@@ -59,10 +61,10 @@ symIn = xp.random.rand(n1,n2,n3).astype(src_type)
 testSymHalf = xp.fft.rfftn(symIn)
 testSymCube = xp.fft.fftn(symIn)
 
-#NumPy returns Fortran ordering from FFTs
+#NumPy returns Fortran ordering from FFTs and always complex128
 if not forGPU:
-    testSymHalf = np.asanyarray(testSymHalf, order='C')
-    testSymCube = np.asanyarray(testSymCube, order='C')
+    testSymHalf = np.asanyarray(testSymHalf, dtype=cplx_type, order='C')
+    testSymCube = np.asanyarray(testSymCube, dtype=cplx_type, order='C')
 
 result1 = fftx.convo.mdrconv(testSrc, testSymHalf)
 # API converts full cube to half cube

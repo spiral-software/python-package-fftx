@@ -60,27 +60,30 @@ if plat_arg == "GPU" and (cp != None):
 else:
     forGPU = False 
 
+xp = np    
+if forGPU:
+    xp = cp
+
 if FORWARD:
     # real to complex
-    src = np.ones(tuple(dims), ftype)
-    for  k in range (np.size(src)):
-        vr = np.random.random()
-        src.itemset(k,vr)
+    src = xp.ones(tuple(dims), ftype)
+    for i in range(dims[0]):
+        for j in range(dims[1]):
+            for k in range(dims[2]):
+                vr = np.random.random()
+                src[i,j,k] = vr
 else:
     # complex to real
     dims2 = dims.copy()
     z = dims2.pop()
     dims2.append(z // 2 + 1)
-    src = np.ones(tuple(dims2), cxtype)
-    for  k in range (np.size(src)):
-        vr = np.random.random()
-        vi = np.random.random()
-        src.itemset(k,vr + vi * 1j)
-
-xp = np    
-if forGPU:
-    src = cp.asarray(src)
-    xp = cp
+    src = xp.ones(tuple(dims2), cxtype)
+    for i in range(dims2[0]):
+        for j in range(dims2[1]):
+            for k in range(dims2[2]):
+                vr = np.random.random()
+                vi = np.random.random()
+                src[i,j,k] = vr + vi * 1j
         
 if FORWARD:
     resC  = fftx.fft.rfftn(src)

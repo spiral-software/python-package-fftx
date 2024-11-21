@@ -29,6 +29,6 @@ convo
 from . import fft
 from . import convo
 
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 

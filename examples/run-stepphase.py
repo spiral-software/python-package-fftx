@@ -32,7 +32,7 @@ N = int ( sys.argv[1] )
 
 src_type = np.double
 if len(sys.argv) > 2:
-    if sys.argv[2] == "f":
+    if sys.argv[2] == "s":
         src_type = np.single
 
 dims = [N,N,N]
@@ -43,18 +43,16 @@ forGPU = (cp != None)
 if len ( sys.argv ) > 3:
     if sys.argv[3] == "CPU":
         forGPU = False
-        
-
-#build test input in numpy (cupy does not have itemset)
-src = np.ones(dimsTuple, dtype=src_type)
-for  k in range (np.size(src)):
-    src.itemset(k,np.random.random()*10.0)
 
 xp = np
 if forGPU:
-    xp = cp
-    #convert src to CuPy array
-    src = cp.asarray(src) 
+    xp = cp       
+
+src = xp.ones(dimsTuple, dtype=src_type)
+for i in range(dims[0]):
+    for j in range(dims[1]):
+        for k in range(dims[2]):
+            src[i,j,k] = np.random.random()*10.0
 
 #get amplitudes from src, so results of operation should ~= src
 

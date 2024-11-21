@@ -44,8 +44,10 @@ def mdrconv(src, symbol, dst=None):
         t = 's'
 
     ns = 'x'.join([str(n) for n in N])  ##  problem.dimensions()])
-    ##  ckey = t + '_mdrconv_' + str(N)
+
     ckey = t + '_mdrconv_' + ns
+    if sp.get_array_module(src) == cp:
+        ckey = ckey + '_CU'
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = MdrconvProblem(N)
@@ -63,15 +65,15 @@ def mdrfsconv(src, symbol, dst=None):
     if sp.get_array_module(src) == cp:
         platform = SP_HIP if sp.has_ROCm() else SP_CUDA
     opts = { SP_OPT_PLATFORM : platform }
-    N = list(src.shape)[1]
+    NNN = list(src.shape)
     t = 'd'
     if src.dtype.name == 'float32':
         opts[SP_OPT_REALCTYPE] = 'float'
         t = 's'
-    ckey = t + '_mdrfsconv_' + str(N)
+    ckey = t + '_mdrfsconv_' + str(NNN)
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
-        problem = MdrfsconvProblem(N)
+        problem = MdrfsconvProblem(NNN)
         solver  = MdrfsconvSolver(problem, opts)
         _solver_cache[ckey] = solver
     result = solver.solve(src, symbol, dst)
@@ -81,7 +83,7 @@ def stepphase(src, amplitudes, dst=None):
     global _solver_cache
     platform = SP_CPU
     xp = sp.get_array_module(src)
-    if cp == cp:
+    if xp == cp:
         platform = SP_HIP if sp.has_ROCm() else SP_CUDA
     opts = { SP_OPT_PLATFORM : platform }
     N = list(src.shape)[1]
@@ -90,6 +92,8 @@ def stepphase(src, amplitudes, dst=None):
         opts[SP_OPT_REALCTYPE] = 'float'
         t = 's'
     ckey = t + '_stepphase_' + str(N)
+    if sp.get_array_module(src) == cp:
+        ckey = ckey + '_CU'
     solver = _solver_cache.get(ckey, 0)
     if solver == 0:
         problem = StepPhaseProblem(N)
