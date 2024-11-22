@@ -59,16 +59,7 @@ if plat_arg == "GPU" and (cp != None):
 else:
     forGPU = False 
 
-# init input
-src = np.zeros(dims, cxtype)
-for k in range (np.size(src)):
-    vr = np.random.random()
-    vi = np.random.random()
-    src.itemset(k, vr + vi * 1j)
-
-xp = np  
 if forGPU:
-    src = cp.asarray(src)
     xp = cp
     dev = 'GPU'
     pymod = 'CuPy'
@@ -77,6 +68,14 @@ else:
     dev = 'CPU'
     pymod = 'NumPy'
 
+# init input
+src = xp.zeros(dims, cxtype)
+for i in range(dims[0]):
+    for j in range(dims[1]):
+        for k in range(dims[2]):
+            vr = np.random.random()
+            vi = np.random.random()
+            src[i,j,k] = vr + vi * 1j
 
 if FORWARD:
     pyfunc = xp.fft.fftn

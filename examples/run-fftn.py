@@ -8,10 +8,12 @@
 
 
 """
-usage: run-fftn sz [ F|I [ d|s [ GPU|CPU ]]]
+usage: run-fftn sz [ F|I [ d|s [ GPU|CPU [Fortran]]]
   sz is N or N1,N2,.. all N >= 2, single N implies 3D cube
   F  = Forward, I = Inverse           (default: Forward)
   d  = double, s = single precision   (default: double precision)
+  GPU is default target unless none exists or no CuPy
+  C ordering is default unless Fortran specified
                                     
   (GPU is default target unless none exists or no CuPy)
   
@@ -63,22 +65,28 @@ if len ( sys.argv ) > 4:
 else:
     plat_arg = "GPU" if (cp != None) else "CPU"
     
+order = 'C'
+if (len ( sys.argv ) > 5) and (sys.argv[5].lower() == 'fortran'):
+    order = 'F'
+    
 if plat_arg == "GPU" and (cp != None):
     forGPU = True
 else:
     forGPU = False 
 
-# init input
-src = np.zeros(dims, cxtype)
-for k in range (np.size(src)):
-    vr = np.random.random()
-    vi = np.random.random()
-    src.itemset(k, vr + vi * 1j)
-
 xp = np  
 if forGPU:
-    src = cp.asarray(src)
     xp = cp
+
+# init input
+src = xp.zeros(dims, cxtype, order)
+for i in range(dims[0]):
+    for j in range(dims[1]):
+        for k in range(dims[2]):
+            vr = np.random.random()
+            vi = np.random.random()
+            src[i,j,k] = vr + vi * 1j
+
         
 if FORWARD:
     resC  = fftx.fft.fftn(src)
