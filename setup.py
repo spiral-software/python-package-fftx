@@ -53,5 +53,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     data_files=find_data_files(),
-    install_requires=['spiralpy'],
+    install_requires=['spiralpy>=1.0.4'],
 )
